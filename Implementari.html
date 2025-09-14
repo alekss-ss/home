@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@</title>
+<link rel="icon" href="./assets/bg_f8f8f8-flat_750x_075_f-pad_750x1000_f8f8f8-removebg-preview.png" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; overflow: hidden; cursor: none; }
+
+/* cursor complet ascuns */
+* { cursor: none !important; }
+
+#myVideo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: -1; }
+.container { max-width: 100%; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70vh; position: relative; z-index: 1; }
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5rem;
+  font-weight: 700;
+  margin-bottom: 70px;
+  text-align: center;
+  background: linear-gradient(270deg, #4f46e5, #6366f1, #a78bfa, #af72cb, #54169f, #ffffff, #54169f);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 8s ease infinite, glowPulse 3s ease-in-out infinite;
+  -webkit-text-stroke: 0.8px rgba(0,0,0,0.6);
+  text-shadow: 0 0 10px rgba(255,255,255,0.7), 2px 2px 6px rgba(0,0,0,0.6);
+}
+@keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes glowPulse { 0%,100% { text-shadow:0 0 10px rgba(255,255,255,0.7), 2px 2px 6px rgba(0,0,0,0.6);} 50% { text-shadow:0 0 20px rgba(255,255,255,1), 2px 2 12px rgba(0,0,0,0.8);} }
+
+.social-buttons { margin-top: 20px; }
+.social-buttons a { display: flex; align-items: center; justify-content: center; width: 225px; padding: 15px 20px; margin: 10px auto; background-color: rgba(255,255,255,0.3); color: #ffffff; text-decoration: none; border-radius: 10px; transition: background-color 0.3s ease, transform 0.2s ease; border: 2px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-family: 'Poppins', sans-serif; font-weight: 600; }
+.social-buttons a:hover { background-color: rgba(255,255,255,0.5); transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+.social-buttons img { margin-right: 6px; height: 20px; }
+
+#enterOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.97); z-index: 5;
+  display:flex; flex-direction: column; align-items:center; justify-content:center;
+  color:#fff; font-size:2rem; font-weight:bold; text-transform:uppercase;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Animatie puncte inline */
+#enterText::after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.1em;
+  animation: dotsAnim 1.90s steps(4) infinite;
+}
+@keyframes dotsAnim {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+  100% { content: ""; }
+}
+
+/* Text clickabil privacy în overlay, jos-centru */
+#enterOverlay #privacyText {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+#enterOverlay #privacyText:hover { color: rgba(255,255,255,1); }
+
+/* Privacy popup */
+#privacyPopup {
+  position: fixed; top:50%; left:50%;
+  transform: translate(-50%, -50%);
+  background: #222; color: #fff;
+  padding: 20px 30px; border-radius: 12px;
+  width: 90%; max-width: 500px; max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+#privacyPopup.show { opacity: 1; visibility: visible; }
+#privacyPopup h2 { margin-top:0; margin-bottom:15px; font-size:1.5rem; text-align:center; }
+#privacyPopup h3 { margin-top:20px; font-size:1.1rem; }
+#privacyPopup p { font-size:0.95rem; line-height:1.5; margin-bottom:10px; }
+
+/* Buton închidere mai mare */
+#privacyPopup .closeBtn {
+  position: absolute;
+  top:10px;
+  right:15px;
+  font-size:2rem;
+  font-weight:bold;
+  color:#fff;
+  cursor:pointer;
+  background:none;
+  border:none;
+  padding: 5px;
+}
+#privacyPopup .closeBtn:hover { color:#ff5555; }
+
+/* Scrollbar estetic */
+#privacyPopup::-webkit-scrollbar { width: 8px; }
+#privacyPopup::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+#privacyPopup::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+#privacyPopup::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+/* Audio player */
+#audioPlayer { position: fixed; bottom:20px; right:20px; background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); color:#fff; display:flex; align-items:center; padding:10px 15px; border-radius:12px; gap:10px; z-index:3; font-family: Arial, sans-serif; width:280px; box-shadow:0 4px 12px rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.3); display:none; }
+#audioPlayer img { width:50px; height:50px; border-radius:8px; object-fit:cover; }
+#trackTitle { color:#fff; font-weight:bold; margin-bottom:4px; overflow:hidden; white-space:nowrap; }
+#trackTitle span { display:inline-block; padding-left:100%; animation:marquee 10s linear infinite; animation-play-state:running; }
+@keyframes marquee { from { transform: translateX(0%); } to { transform: translateX(-100%); } }
+#trackSlider { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background: linear-gradient(90deg, #af72cb, #54169f, #ffffff, #54169f); outline:none; cursor:pointer; }
+#trackSlider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#54169f; border:2px solid #fff; cursor:pointer; box-shadow:0 0 4px rgba(0,0,0,0.5); margin-top:-4px; }
+#playBtn { cursor:pointer; font-size:1.2rem; user-select:none; }
+
+/* Custom cursor */
+#customCursor { position: fixed; top:0; left:0; width:15px; height:15px; background:#fff; border:2px solid #000; border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%, -50%); transition: transform 0.1s ease; box-shadow:0 0 4px rgba(0,0,0,0.7); }
+
+/* Watermark */
+#watermark { position: fixed; bottom:10px; left:10px; font-family:'Poppins', sans-serif; font-weight:600; font-size:14px; color:#fff; opacity:0.7; pointer-events:none; z-index:9999; }
+</style>
+</head>
+<body>
+<video autoplay muted loop id="myVideo">
+  <source src="./assets/237559615e677a7c612c0b7b425d1757.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+
+<div id="enterOverlay">
+  <span id="enterText">CLICK TO ENTER</span>
+  <div id="privacyText">Politica de confidențialitate</div>
+</div>
+
+<div class="container">
+  <h1><b>ALekss</b></h1>
+  <div class="social-buttons">
+    <a href="https://www.instagram.com/alex_6_4_1" target="_blank"><img src="./assets/Instagram_logo_2022.svg.png" alt="Instagram">Instagram</a>
+    <a href="https://www.youtube.com/@ALekssPlays" target="_blank"><img src="./assets/1384060.png" alt="YouTube">YouTube</a>
+    <a href="https://discord.com/users/672747394709979139" target="_blank"><img src="./assets/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" alt="Discord">Discord</a>
+    <a href="https://www.tiktok.com/@_.alekss" target="_blank"><img src="./assets/4362958_tiktok_logo_social media_icon.png" alt="TikTok">TikTok</a>
+  </div>
+</div>
+
+<div id="privacyPopup">
+  <button class="closeBtn">&times;</button>
+  <h2>Politica de confidențialitate</h2>
+
+  <h3>1. Introducere</h3>
+  <p>Respectăm confidențialitatea vizitatorilor acestui site. Informațiile colectate sunt minime și au rol exclusiv tehnic și de funcționare corectă a paginii.</p>
+
+  <h3>2. Date colectate</h3>
+  <p>• Nu colectăm date personale direct.<br>
+  • Site-ul poate înregistra automat informații tehnice precum adresa IP, tipul de browser și cookie-uri, pentru funcționarea corectă și îmbunătățirea experienței utilizatorului.</p>
+
+  <h3>3. Servicii externe</h3>
+  <p>Acest site conține linkuri către platforme externe (Instagram, YouTube, TikTok, Discord). Aceste platforme pot colecta date conform propriilor politici de confidențialitate. Recomandăm consultarea acestora direct pe site-urile respective.</p>
+
+  <h3>4. Utilizarea datelor</h3>
+  <p>Datele tehnice pot fi folosite pentru:<br>
+  - îmbunătățirea performanței site-ului,<br>
+  - protecție împotriva abuzurilor,<br>
+  - statistici de acces.</p>
+
+  <h3>5. Drepturile utilizatorilor</h3>
+  <p>Utilizatorii au dreptul să solicite ștergerea sau rectificarea oricăror date personale care au fost oferite voluntar prin contact direct.</p>
+
+  <h3>6. Contact</h3>
+  <p>Pentru întrebări legate de confidențialitate sau drepturi de autor, mă puteți contacta la: <b>alekss.inquires@gmail.com</b>.</p>
+
+  <h3>7. Disclaimer</h3>
+  <p>Acest site este un proiect personal și <b>nu este afiliat</b> cu Instagram, YouTube, TikTok, Discord sau alte servicii menționate. Toate mărcile și logourile aparțin proprietarilor lor de drept.</p>
+  <p>Materialele audio/video integrate pe site <b>nu îmi aparțin</b>; drepturile de autor aparțin artiștilor și proprietarilor originali. Acestea sunt folosite doar în scop demonstrativ/personal.</p>
+  <p>Nu îmi asum responsabilitatea pentru conținutul, practicile sau politicile de confidențialitate ale platformelor externe accesibile prin linkurile prezente pe site.</p>
+</div>
+
+<div id="audioPlayer">
+  <img src="./assets/bonsai2.png" alt="Cover" id="trackCover">
+  <div>
+    <div id="trackTitle"><span>BVCOVIA - BONSAI</span></div>
+    <input type="range" id="trackSlider" value="0" min="0" max="100">
+  </div>
+  <div id="playBtn">▶</div>
+</div>
+
+<audio id="audio" src="https://r2.guns.lol/a3d3a551-1454-42df-875f-38c4c02cce13.mp3" loop></audio>
+
+<div id="customCursor"></div>
+<div id="watermark">♥ Made by me</div>
+
+<script>
+const enterOverlay = document.getElementById('enterOverlay');
+const enterText = document.getElementById('enterText');
+const privacyText = document.getElementById('privacyText');
+const privacyPopup = document.getElementById('privacyPopup');
+const closePrivacy = document.querySelector('#privacyPopup .closeBtn');
+
+const audioPlayer = document.getElementById('audioPlayer');
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const trackSlider = document.getElementById('trackSlider');
+const customCursor = document.getElementById('customCursor');
+const trackSpan = document.querySelector('#trackTitle span');
+
+document.addEventListener('mousemove', e => {
+  customCursor.style.left = e.clientX+'px';
+  customCursor.style.top = e.clientY+'px';
+});
+
+// Privacy popup
+privacyText.addEventListener('click', e=>{
+  e.stopPropagation();
+  privacyPopup.classList.add('show');
+  privacyText.style.display = 'none';
+});
+
+// Close privacy popup cu X
+closePrivacy.addEventListener('click', ()=>{
+  privacyPopup.classList.remove('show');
+  privacyText.style.display = 'block';
+});
+
+// Închidere popup la click în afara lui
+document.addEventListener('click', (e) => {
+  if (privacyPopup.classList.contains('show') && !privacyPopup.contains(e.target) && e.target !== privacyText) {
+    privacyPopup.classList.remove('show');
+    privacyText.style.display = 'block';
+  }
+});
+
+// Enter overlay click
+enterOverlay.addEventListener('click', ()=>{
+  if(!privacyPopup.classList.contains('show')){
+    enterOverlay.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    enterOverlay.style.opacity = '0';
+    enterOverlay.style.transform = 'scale(1.2)';
+    setTimeout(()=>{ enterOverlay.style.display='none'; },800);
+
+    audioPlayer.style.display='flex';
+    audio.play();
+    playBtn.textContent='⏸';
+    trackSpan.style.animationPlayState='running';
+  }
+});
+
+// Audio player controls
+playBtn.addEventListener('click', ()=>{
+  if(audio.paused){ audio.play(); playBtn.textContent='⏸'; trackSpan.style.animationPlayState='running'; }
+  else { audio.pause(); playBtn.textContent='▶'; trackSpan.style.animationPlayState='paused'; }
+});
+audio.addEventListener('timeupdate', ()=>{ trackSlider.value=(audio.currentTime/audio.duration)*100; });
+trackSlider.addEventListener('input', ()=>{ audio.currentTime=(trackSlider.value/100)*audio.duration; });
+audio.addEventListener('ended', ()=>{ audio.currentTime=0; audio.play(); playBtn.textContent='⏸'; trackSpan.style.animationPlayState='running'; });
+
+// Animate title
+const titleBase = "@"; const titleText = "ALekss"; let index=0; let forward=true;
+function animateTitle(){
+  if(forward){ index++; if(index>titleText.length){ forward=false; setTimeout(animateTitle,1000); return;} }
+  else { index--; if(index<0){ forward=true; setTimeout(animateTitle,550); return;} }
+  document.title=titleBase+titleText.substring(0,index); setTimeout(animateTitle,270);
+}
+animateTitle();
+</script>
+</body>
+</html>
